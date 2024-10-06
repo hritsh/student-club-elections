@@ -7,22 +7,27 @@ function VotePage({ clubs }) {
 	const navigate = useNavigate();
 	const [isConfirming, setIsConfirming] = useState(false);
 	const [selectedCandidate, setSelectedCandidate] = useState(null);
+	const [loading, setLoading] = useState(false); // Add loading state to prevent spamming
 
 	const club = clubs[clubIndex];
 
-	const handleVote = async () => {
+	const handleVote = () => {
 		if (selectedCandidate) {
 			setIsConfirming(true);
 		}
 	};
 
 	const confirmVote = async () => {
+		if (loading) return; // Prevent duplicate clicks
+		setLoading(true); // Set loading to true when vote is submitted
+
 		try {
 			await castVote(club.name, selectedCandidate);
 			navigate("/success");
 		} catch (error) {
 			console.error("Error casting vote:", error);
 			alert("There was an error casting your vote. Please try again.");
+			setLoading(false); // Re-enable voting in case of an error
 		}
 	};
 
@@ -43,14 +48,19 @@ function VotePage({ clubs }) {
 					</button>
 				))}
 			</div>
+
 			{selectedCandidate && (
 				<button
 					onClick={handleVote}
-					className="mt-6 w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+					className={`mt-6 w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ${
+						loading ? "opacity-50 cursor-not-allowed" : ""
+					}`}
+					disabled={loading} // Disable button while loading
 				>
-					Vote for {selectedCandidate}
+					{loading ? "Submitting..." : `Vote for ${selectedCandidate}`} {/* Show loading text */}
 				</button>
 			)}
+
 			<button
 				onClick={() => navigate("/")}
 				className="mt-4 w-full p-4 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-300"
@@ -72,9 +82,12 @@ function VotePage({ clubs }) {
 							</button>
 							<button
 								onClick={confirmVote}
-								className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+								className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300 ${
+									loading ? "opacity-50 cursor-not-allowed" : ""
+								}`}
+								disabled={loading} // Disable confirm button while loading
 							>
-								Confirm Vote
+								{loading ? "Submitting..." : "Confirm Vote"} {/* Show loading text */}
 							</button>
 						</div>
 					</div>

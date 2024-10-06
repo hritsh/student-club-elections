@@ -25,9 +25,11 @@ const clubs = [
 function App() {
 	return (
 		<Router>
-			<div className="min-h-screen bg-orange-500 p-8">
-				<div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-					<img src={sgMainLogo} alt="SG Main Logo" className="h-full px-40 py-5" />
+			<div className="min-h-screen bg-orange-500 flex items-center justify-center p-4 md:p-8">
+				<div className="max-w-md w-full bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+					<div className="flex justify-center py-5">
+						<img src={sgMainLogo} alt="SG Main Logo" className="w-40 md:w-48" />
+					</div>
 					<Routes>
 						<Route path="/" element={<HomePage clubs={clubs} />} />
 						<Route path="/vote/:clubIndex" element={<VotePage clubs={clubs} />} />
