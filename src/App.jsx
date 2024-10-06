@@ -1,4 +1,6 @@
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import HomePage from "./components/HomePage";
 import VotePage from "./components/VotePage";
 import SuccessPage from "./components/SuccessPage";
@@ -6,23 +8,32 @@ import sgMainLogo from "./assets/sgmain-logo.png";
 
 const clubs = [
 	{
-		name: "Music Club",
+		name: "Gamers Guild",
 		time: "12:00 PM - 12:20 PM",
-		candidates: ["Sabina Sabitzhanova", "Annabelle Saliba", "Adeeb Harb", "Gulyorakhon Akbarkhanova"],
+		candidates: ["Akhliddin Koziboev", "Gulzam Basheer"],
 	},
 	{
-		name: "Anime Club",
+		name: "Arts Society",
 		time: "12:20 PM - 12:40 PM",
-		candidates: ["Arsilan Abbas", "Akashay Kumar Thory", "Syed Burhanuddin Ayaan", "Salaheddine Radiousse"],
+		candidates: ["Aws Abdulrazaq", "Yogesh Mata", "Racha Houbabi", "Maryam Husain"],
 	},
 	{
-		name: "Desi Club",
+		name: "Marketing Club",
 		time: "12:40 PM - 1:00 PM",
-		candidates: ["Kumail Amir", "Wafa Zehra Jafri", "Ishvarya Simhan", "Fathima Rasha"],
+		candidates: ["Layan Albadareen", "Osama Ghanem", "Nurbergen Nurlanuly"],
 	},
 ];
 
 function App() {
+	const [hasVoted, setHasVoted] = useState(false);
+
+	useEffect(() => {
+		// Check if the "voted" cookie is set
+		if (Cookies.get("voted")) {
+			setHasVoted(true);
+		}
+	}, []);
+
 	return (
 		<Router>
 			<div className="min-h-screen bg-orange-500 flex items-center justify-center p-4 md:p-8">
@@ -31,8 +42,8 @@ function App() {
 						<img src={sgMainLogo} alt="SG Main Logo" className="w-40 md:w-48" />
 					</div>
 					<Routes>
-						<Route path="/" element={<HomePage clubs={clubs} />} />
-						<Route path="/vote/:clubIndex" element={<VotePage clubs={clubs} />} />
+						<Route path="/" element={hasVoted ? <Navigate to="/success" /> : <HomePage clubs={clubs} />} />
+						<Route path="/vote/:clubIndex" element={hasVoted ? <Navigate to="/success" /> : <VotePage clubs={clubs} />} />
 						<Route path="/success" element={<SuccessPage />} />
 					</Routes>
 				</div>

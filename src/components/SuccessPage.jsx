@@ -1,21 +1,16 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 function SuccessPage() {
-	const navigate = useNavigate();
-
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			navigate("/");
-		}, 5000);
-
-		return () => clearTimeout(timer);
-	}, [navigate]);
+		// Set a cookie to indicate that the user has voted
+		Cookies.set("voted", "true", { expires: 1 }); // Cookie expires in 1 day
+	}, []);
 
 	return (
 		<div className="p-8 text-center">
 			<h1 className="text-3xl font-bold mb-6 text-green-600">Vote Successful!</h1>
-			<p className="text-lg text-green-500">Thank you for voting. You will be redirected to the home page in 5 seconds.</p>
+			<p className="text-lg text-green-500">Thank you for voting.</p>
 		</div>
 	);
 }

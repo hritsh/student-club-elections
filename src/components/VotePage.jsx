@@ -7,12 +7,15 @@ function VotePage({ clubs }) {
 	const navigate = useNavigate();
 	const [isConfirming, setIsConfirming] = useState(false);
 	const [selectedCandidate, setSelectedCandidate] = useState(null);
+	const [ritId, setRitId] = useState(""); // Add state for RIT ID
 	const [loading, setLoading] = useState(false); // Add loading state to prevent spamming
+	const [ritIdError, setRitIdError] = useState(""); // Add state for RIT ID error
+	const [isRitIdValid, setIsRitIdValid] = useState(false); // Add state for RIT ID validation
 
 	const club = clubs[clubIndex];
 
 	const handleVote = () => {
-		if (selectedCandidate) {
+		if (selectedCandidate && isRitIdValid) {
 			setIsConfirming(true);
 		}
 	};
@@ -22,12 +25,23 @@ function VotePage({ clubs }) {
 		setLoading(true); // Set loading to true when vote is submitted
 
 		try {
-			await castVote(club.name, selectedCandidate);
+			await castVote(club.name, selectedCandidate, ritId); // Send RIT ID in the POST request
 			navigate("/success");
 		} catch (error) {
 			console.error("Error casting vote:", error);
 			alert("There was an error casting your vote. Please try again.");
 			setLoading(false); // Re-enable voting in case of an error
+		}
+	};
+
+	const validateRitId = (id) => {
+		const regex = /^[a-zA-Z]{2,3}\d{4}$/;
+		if (!regex.test(id)) {
+			setRitIdError("Invalid RIT ID format. It should be 2-3 letters followed by 4 numbers.");
+			setIsRitIdValid(false);
+		} else {
+			setRitIdError("");
+			setIsRitIdValid(true);
 		}
 	};
 
@@ -50,15 +64,28 @@ function VotePage({ clubs }) {
 			</div>
 
 			{selectedCandidate && (
-				<button
-					onClick={handleVote}
-					className={`mt-6 w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ${
-						loading ? "opacity-50 cursor-not-allowed" : ""
-					}`}
-					disabled={loading} // Disable button while loading
-				>
-					{loading ? "Submitting..." : `Vote for ${selectedCandidate}`} {/* Show loading text */}
-				</button>
+				<div className="mt-6">
+					<input
+						type="text"
+						placeholder="Enter your RIT ID"
+						value={ritId}
+						onChange={(e) => {
+							setRitId(e.target.value);
+							validateRitId(e.target.value);
+						}}
+						className="w-full p-4 border rounded-lg mb-2"
+					/>
+					{ritIdError && <p className="text-red-500 mb-2">{ritIdError}</p>}
+					<button
+						onClick={handleVote}
+						className={`w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ${
+							loading || !isRitIdValid ? "opacity-50 cursor-not-allowed" : ""
+						}`}
+						disabled={loading || !isRitIdValid} // Disable button while loading or if RIT ID is invalid
+					>
+						{loading ? "Submitting..." : `Vote for ${selectedCandidate}`} {/* Show loading text */}
+					</button>
+				</div>
 			)}
 
 			<button
